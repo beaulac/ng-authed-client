@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/index';
+import { Observable } from 'rxjs';
 import { InjectionToken, Type } from '@angular/core';
 
 export interface AuthService {

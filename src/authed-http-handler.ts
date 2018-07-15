@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { switchMap, take, timeout } from 'rxjs/operators';
 import { HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
@@ -17,12 +17,12 @@ export class AuthedHttpHandler extends HttpHandler {
         return this.auth.idToken.pipe(
             take(1),
             timeout(10000),
-            switchMap(token => {
-                if (token) {
-                    return this.handleRequest(req, token);
-                }
-                throw Error('Not authenticated.');
-            })
+            switchMap(
+                token =>
+                    token
+                        ? this.handleRequest(req, token)
+                        : throwError(Error('Not authenticated.'))
+            )
         );
     }
 
