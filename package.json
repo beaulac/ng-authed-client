@@ -47,9 +47,7 @@
     "url": "git+https://github.com/beaulac/ng-authed-client.git"
   },
   "keywords": [
-    "angular5",
-    "angular4",
-    "angular2",
+    "angular6",
     "angular"
   ],
   "author": "Antoine Beauvais-Lacasse",
