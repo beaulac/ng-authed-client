@@ -1,24 +1,26 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HelloWorldComponent } from './hello-world.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthedHttpHandler } from './authed-http-handler';
 import { AuthedClient } from './authed-client';
-import { AuthedClientConfig, authServiceToken } from './authed-client.config';
+import {
+    AuthedClientOptions,
+    authServiceToken,
+    clientConfigToken,
+    withDefaults
+} from './authed-client.config';
 
 @NgModule({
-    declarations: [HelloWorldComponent],
-    imports: [CommonModule, HttpClientModule],
-    exports: [HelloWorldComponent]
+    imports: [HttpClientModule]
 })
 export class AuthedClientModule {
-    static forRoot(config: AuthedClientConfig): ModuleWithProviders {
+    static forRoot(options: AuthedClientOptions): ModuleWithProviders {
         return {
             ngModule: AuthedClientModule,
             providers: [
                 AuthedHttpHandler,
                 AuthedClient,
-                { provide: authServiceToken, useClass: config.authService }
+                { provide: authServiceToken, useClass: options.authService },
+                { provide: clientConfigToken, useValue: withDefaults(options) }
             ]
         };
     }

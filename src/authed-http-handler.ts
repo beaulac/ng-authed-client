@@ -1,27 +1,33 @@
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { switchMap, take, timeout } from 'rxjs/operators';
 import { HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { AuthService, authServiceToken } from './authed-client.config';
+import {
+    AuthedClientConfig,
+    AuthService,
+    authServiceToken,
+    clientConfigToken
+} from './authed-client.config';
 
 @Injectable()
 export class AuthedHttpHandler extends HttpHandler {
     constructor(
         private delegate: HttpHandler,
-        @Inject(authServiceToken) private auth: AuthService
+        @Inject(authServiceToken) private auth: AuthService,
+        @Inject(clientConfigToken) private config: AuthedClientConfig
     ) {
         super();
     }
 
-    handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+    public handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
         return this.auth.idToken.pipe(
             take(1),
-            timeout(10000),
+            timeout(this.config.tokenTimeout),
             switchMap(
                 token =>
-                    token
+                    this.config.isTokenValid(token)
                         ? this.handleRequest(req, token)
-                        : throwError(Error('Not authenticated.'))
+                        : this.config.onMissingToken()
             )
         );
     }
@@ -30,13 +36,13 @@ export class AuthedHttpHandler extends HttpHandler {
         req: HttpRequest<any>,
         token: string
     ): Observable<HttpEvent<any>> {
-        // Req is immutable and must be cloned.
-        req = req.clone({
-            setHeaders: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        return this.delegate.handle(req);
+        return this.delegate.handle(
+            // Req is immutable and must be cloned.
+            req.clone({
+                setHeaders: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+        );
     }
 }
