@@ -2,6 +2,6 @@ import { Component } from '@angular/core';
 
 @Component({
     selector: 'nac-demo-app',
-    template: '<nac-hello-world></nac-hello-world>'
+    template: '<p>Empty Demo, sorry :C</p>'
 })
 export class DemoComponent {}
