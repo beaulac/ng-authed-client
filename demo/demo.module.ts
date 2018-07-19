@@ -3,17 +3,17 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AuthedClientModule } from '../src';
 import { DemoComponent } from './demo.component';
 import { BehaviorSubject } from 'rxjs/index';
-import { AuthService } from '../src/authed-client.config';
+import { AuthService } from '../src';
 
-class DummyAuth implements AuthService {
-    public idToken = new BehaviorSubject('fakeToken');
+export class DemoAuth implements AuthService {
+    public idToken = new BehaviorSubject('demoToken');
 }
 
 @NgModule({
     declarations: [DemoComponent],
     imports: [
         BrowserModule,
-        AuthedClientModule.forRoot({ authService: DummyAuth })
+        AuthedClientModule.forRoot({ authService: DemoAuth })
     ],
     bootstrap: [DemoComponent]
 })
