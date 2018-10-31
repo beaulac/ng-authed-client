@@ -1,6 +1,5 @@
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { InjectionToken, Type } from '@angular/core';
-import { throwError } from 'rxjs/index';
 
 export interface AuthService {
     readonly idToken: Observable<string>;

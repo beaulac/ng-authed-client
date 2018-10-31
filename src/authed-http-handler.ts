@@ -10,7 +10,7 @@ import {
 } from './authed-client.config';
 
 @Injectable()
-export class AuthedHttpHandler extends HttpHandler {
+export class AuthedHttpHandler<T> extends HttpHandler {
     constructor(
         private delegate: HttpHandler,
         @Inject(authServiceToken) private auth: AuthService,
@@ -19,7 +19,7 @@ export class AuthedHttpHandler extends HttpHandler {
         super();
     }
 
-    public handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+    public handle(req: HttpRequest<T>): Observable<HttpEvent<T>> {
         return this.auth.idToken.pipe(
             take(1),
             timeout(this.config.tokenTimeout),
@@ -33,16 +33,20 @@ export class AuthedHttpHandler extends HttpHandler {
     }
 
     private handleRequest(
-        req: HttpRequest<any>,
+        req: HttpRequest<T>,
         token: string
-    ): Observable<HttpEvent<any>> {
+    ): Observable<HttpEvent<T>> {
         return this.delegate.handle(
             // Req is immutable and must be cloned.
-            req.clone({
-                setHeaders: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+            req.clone(this.updateRequestWithToken(req, token))
         );
+    }
+
+    protected updateRequestWithToken(req: HttpRequest<T>, token: string) {
+        return {
+            setHeaders: {
+                Authorization: `Bearer ${token}`
+            }
+        };
     }
 }
